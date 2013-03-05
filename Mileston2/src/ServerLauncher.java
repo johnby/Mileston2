@@ -6,8 +6,8 @@ import server.VoteListener;
 
 public class ServerLauncher {
 
-	private static int defaultPort = 9999;
-	private static int defaultVotePort = 7778;
+	public static int defaultPort = 9999;
+	public static int defaultVotePort = 7778;
 	private static ConnectionListener l = null;
 	
 	public static void main(String[] args)
