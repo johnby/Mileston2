@@ -142,7 +142,7 @@ public class Poll {
 		{
 			float percent = (float)(voteCount.get(i)) / (float)(totalVotes);
 			results += (i+1) + ". " + answers.get(i) + "\n";
-			results += " " + voteCount.get(i) + " of " + totalVotes + " = " + percent + "% \n";
+			results += "\t" + voteCount.get(i) + " of " + totalVotes + " = " + percent + "% \n";
 		}
 		
 		return results;
