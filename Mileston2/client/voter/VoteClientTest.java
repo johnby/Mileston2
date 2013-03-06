@@ -16,7 +16,7 @@ public class VoteClientTest {
 	@Test
 	public void testVote()
 	{
-		String pollId = "1mhs3";
+		String pollId = "1en4t";
 		
 		for(int i=0; i <200; i++)
 		{

@@ -44,6 +44,8 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 	private JLabel lblPollId = null;
 	private JTextArea pollStatus = null;
 	
+	private ArrayList<Answer> answers = null;
+	
 	protected BufferedReader reader = null;
 	protected PrintWriter writer = null;
 	
@@ -65,6 +67,8 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
         OutputStreamWriter osr = new OutputStreamWriter(outputStream);
         writer = new PrintWriter(socket.getOutputStream(), true);
 		
+        answers = new ArrayList<Answer>();
+        
 		setupPanel();
 	}
 
@@ -90,8 +94,11 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		btnAdd.addActionListener(this);
 		answerPanel.add(btnAdd);
 		
-		answerPanel.add(createAnswerPanel(1));
-		answerPanel.add(createAnswerPanel(2));
+		answers.add(new Answer(1));
+		answers.add(new Answer(2));
+		
+		answerPanel.add(answers.get(0));
+		answerPanel.add(answers.get(1));
 		
 		this.add(answerPanel);
 		
@@ -117,16 +124,7 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		this.add(pollStatus);
 	}
 	
-	private static JPanel createAnswerPanel(int id)
-	{
-		JPanel a = new JPanel();
-		a.add(new JLabel("Answer " + id));
-		JTextField answer = new JTextField();
-		answer.setPreferredSize(new Dimension(300,25));
-		a.add(answer);
-		
-		return a;
-	}
+
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
@@ -144,6 +142,33 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 					Connect c = new Connect();
 					c.setEmailAddress("test email");
 					sendMessage(c);
+				}
+			}
+			else if(source.equals(btnPause))
+			{
+				if(this.state == State.Running && this.pState == PollState.Open)
+				{
+					System.out.println("Sending pause");
+					PausePoll p = new PausePoll();
+					sendMessage(p);
+				}
+			}
+			else if(source.equals(btnResume))
+			{
+				if(this.state == State.Running && this.pState == PollState.Paused)
+				{
+					System.out.println("Sending resume");
+					ResumePoll r = new ResumePoll();
+					sendMessage(r);
+				}
+			}
+			else if(source.equals(btnStop))
+			{
+				if(this.state == State.Running && this.pState != PollState.Closed)
+				{
+					System.out.println("Sending stop");
+					StopPoll s = new StopPoll();
+					sendMessage(s);
 				}
 			}
 		}
@@ -180,6 +205,14 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 				// Add answers here!!!!!!
 				// TO-DO: !!!
 				
+				ArrayList<String> answerList = new ArrayList<String>();
+				for(Answer a : answers)
+				{
+					answerList.add(a.getTextValue());
+				}
+				
+				cp.setAnswers(answerList);
+				
 				sendMessage(cp);
 			}
 		}
@@ -191,6 +224,7 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 				lblPollId.setText(cpr.getPollId());
 				
 				this.state = State.Running;
+				this.pState = PollState.Open;
 			}
 		}
 		else if(this.state == State.Running)
@@ -198,6 +232,7 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 			if(message instanceof PausePollReply)
 			{
 				this.pState = PollState.Paused;
+				updateGUI();
 			}
 			else if(message instanceof ResumePollReply)
 			{
@@ -228,6 +263,25 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 			}
 		}
 		else if(this.state == State.Closed)
+		{
+			
+		}
+	}
+
+	private void updateGUI() {
+		if(pState == PollState.Open)
+		{
+			
+		}
+		else if(pState == PollState.Closed)
+		{
+			
+		}
+		else if(pState == PollState.Paused)
+		{
+			
+		}
+		else if(pState == PollState.None)
 		{
 			
 		}
@@ -272,4 +326,23 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		}
 	}
 	
+
+}
+
+class Answer extends JPanel
+{
+	private JTextField answer = null;
+	
+	public Answer(int id)
+	{
+		this.add(new JLabel("Answer " + id));
+		answer = new JTextField();
+		answer.setPreferredSize(new Dimension(300,25));
+		this.add(answer);
+	}
+	
+	public String getTextValue()
+	{
+		return answer.getText();
+	}
 }
