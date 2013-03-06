@@ -43,17 +43,21 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 	private JButton btnAdd = null;
 	private JLabel lblPollId = null;
 	private JTextArea pollStatus = null;
+	private JPanel answerPanel = null;
 	
 	private ArrayList<Answer> answers = null;
 	
 	protected BufferedReader reader = null;
 	protected PrintWriter writer = null;
 	
+	private AdminClient adminClient = null;
+	
 	private String pollId = "";
 	//private String email = null;
 	
-	public AdminPoll(Socket socket) throws IOException
+	public AdminPoll(AdminClient adminClient, Socket socket) throws IOException
 	{
+		this.adminClient = adminClient;
 		//this.email = email;
 		this.socket = socket;
 		
@@ -70,6 +74,7 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
         answers = new ArrayList<Answer>();
         
 		setupPanel();
+		updateGUI();
 	}
 
 	private void setupPanel() {
@@ -85,7 +90,7 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		txtQuestion.addActionListener(this);
 		
 		// answer comp
-		JPanel answerPanel = new JPanel();
+		answerPanel = new JPanel();
 		answerPanel.setLayout(new BoxLayout(answerPanel, BoxLayout.PAGE_AXIS));
 		lblPollId = new JLabel("");
 		answerPanel.add(lblPollId);
@@ -120,7 +125,7 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		this.add(controlPanel);
 		
 		pollStatus = new JTextArea();
-		pollStatus.setPreferredSize(new Dimension(100,300));
+		pollStatus.setPreferredSize(new Dimension(300,200));
 		this.add(pollStatus);
 	}
 	
@@ -140,7 +145,7 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 				if(this.state == State.Connect)
 				{
 					Connect c = new Connect();
-					c.setEmailAddress("test email");
+					c.setEmailAddress(adminClient.getEmailAddress());
 					sendMessage(c);
 				}
 			}
@@ -171,6 +176,20 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 					sendMessage(s);
 				}
 			}
+			else if(source.equals(btnAdd))
+			{
+				if(this.state == State.Connect && this.pState == PollState.None)
+				{
+					if(answers.size() <= 6)
+					{
+						Answer a = new Answer(answers.size() + 1);
+						answers.add(a);
+						answerPanel.add(a);
+					}
+				}
+			}
+			
+			updateGUI();
 		}
 	}
 	
@@ -249,13 +268,15 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 				String id = pu.getPollId();
 				ArrayList<Long> results = pu.getResults();
 				
-				String status = "Id = " + id;
-
+				String status = "Id = " + id + "\n";
+				status += "Results" + "\n";
+				status += "____________________" + "\n";
+				status += "Option\tVotes" + "\n";
 				int i = 0;
 				for(Long s: results)
 				{
 					
-					status += i + " " + s.toString() + "\n";
+					status += i + "\t" + s.toString() + "\n";
 					i++;
 				}
 				
@@ -266,12 +287,35 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		{
 			
 		}
+		
+		updateGUI();
 	}
 
 	private void updateGUI() {
+		btnAdd.setEnabled(false);
+		btnCreate.setEnabled(false);
+		btnResume.setEnabled(false);
+		btnPause.setEnabled(false);
+		btnStop.setEnabled(false);
+		pollStatus.setEditable(false);
+		
+		if(state == State.Connect)
+		{
+			btnCreate.setEnabled(true);
+			
+			if(answers.size() <= 6)
+			{
+				btnAdd.setEnabled(true);
+			}
+		}
+		else if(state == State.Running)
+		{
+			btnStop.setEnabled(true);
+		}
+		
 		if(pState == PollState.Open)
 		{
-			
+			btnPause.setEnabled(true);
 		}
 		else if(pState == PollState.Closed)
 		{
@@ -279,12 +323,18 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		}
 		else if(pState == PollState.Paused)
 		{
-			
+			btnResume.setEnabled(true);
 		}
 		else if(pState == PollState.None)
 		{
 			
 		}
+		
+		answerPanel.revalidate();
+		answerPanel.repaint();
+		
+		validate();
+		repaint();
 	}
 
 	public void quit() throws IOException

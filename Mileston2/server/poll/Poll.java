@@ -124,5 +124,28 @@ public class Poll {
 			return old;
 		}
 	}
+	
+	public String getResultString()
+	{
+		String results = "";
+		results += "Id = " + getId() + "\n";
+		results += "Question = " + getQuestion() + "\n";
+
+		int totalVotes = 0;
+		
+		for(Long i : voteCount)
+		{
+			totalVotes += i;
+		}
+		
+		for(int i=0; i<voteCount.size(); i++)
+		{
+			float percent = (float)(voteCount.get(i)) / (float)(totalVotes);
+			results += (i+1) + ". " + answers.get(i) + "\n";
+			results += " " + voteCount.get(i) + " of " + totalVotes + " = " + percent + "% \n";
+		}
+		
+		return results;
+	}
 
 }
