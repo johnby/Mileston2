@@ -23,6 +23,11 @@ public class Poll {
 		this.votes = new Hashtable<String, Long>();
 		this.voteCount = new ArrayList<Long>();
 		
+		if(answers == null)
+		{
+			answers = new ArrayList<String>();
+		}
+		
 		for(long i=0; i<answers.size(); i++)
 			this.voteCount.add(0L);
 

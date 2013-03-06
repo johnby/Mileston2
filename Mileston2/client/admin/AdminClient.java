@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
@@ -17,12 +19,15 @@ import javax.swing.SpringLayout;
 public class AdminClient extends JFrame {
 
 	JPanel panel = null;
-	ArrayList<JPanel> answerPanels = null;
+	ArrayList<AdminPoll> polls = null;
+	Socket socket = null;
 	
-	public AdminClient(String host, int defaultPort)
+	public AdminClient(String host, int port) throws IOException
 	{	
 		super("Admin Client");
 	
+		socket = new Socket(host, port);
+		
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		panel.setPreferredSize(new Dimension(800,600));
@@ -35,6 +40,13 @@ public class AdminClient extends JFrame {
 		this.getContentPane().add(panel, BorderLayout.CENTER);
 		this.pack();
 		this.setVisible(true);
+		
+		polls = new ArrayList<AdminPoll>();
+		AdminPoll poll = new AdminPoll(socket);
+		polls.add(poll);
+		Thread pollThread = new Thread(poll);
+		pollThread.start();
+		
 		
 		addGuiComponents();
 	}
@@ -49,45 +61,12 @@ public class AdminClient extends JFrame {
 		emailPanel.add(email);
 		panel.add(emailPanel);
 		
-		// question comp
-		JPanel questionPanel = new JPanel();
-		questionPanel.add(new JLabel("Question:"));
-		JTextField question = new JTextField();
-		question.setPreferredSize(new Dimension(300,25));
-		questionPanel.add(question);
-		panel.add(questionPanel);
-		
-		// answer comp
-		JPanel answerPanel = new JPanel();
-		answerPanel.setLayout(new BoxLayout(answerPanel, BoxLayout.PAGE_AXIS));
-		answerPanel.add(new JLabel("Answers:"));
-		answerPanel.add(new JButton("Add"));
-		
-		answerPanel.add(createAnswerPanel(1));
-		answerPanel.add(createAnswerPanel(2));
-		
-		panel.add(answerPanel);
-		
-		JPanel controlPanel = new JPanel();
-		controlPanel.setLayout(new FlowLayout());
-		controlPanel.add(new JButton("Pause"));
-		controlPanel.add(new JButton("Resume"));
-		controlPanel.add(new JButton("Stop"));
-		
-		
-		panel.add(controlPanel);
-		
-	}
 
-	private JPanel createAnswerPanel(int id)
-	{
-		JPanel a = new JPanel();
-		a.add(new JLabel("Answer " + id));
-		JTextField answer = new JTextField();
-		answer.setPreferredSize(new Dimension(300,25));
-		a.add(answer);
+		panel.add(polls.get(0));
 		
-		return a;
 	}
 	
+
+
+
 }
