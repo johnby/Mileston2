@@ -7,5 +7,6 @@
 	<classpathentry kind="src" path="client"/>
 	<classpathentry kind="src" path="shared"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="C:/Users/Nishant/git/Mileston2/Mileston2/JMAPI/javamail-1.4.2/mail.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
