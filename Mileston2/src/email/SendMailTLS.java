@@ -13,8 +13,8 @@ import javax.mail.internet.MimeMessage;
  
 public class SendMailTLS {
  
-	public static void main(String[] args) {
- 
+	public static void SendEmail(String email, String subject, String message)
+	{
 		final String username = "nikieme4@gmail.com";
 		final String password = "pollserver";
  
@@ -33,20 +33,20 @@ public class SendMailTLS {
  
 		try {
  
-			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress("from-email@gmail.com"));
-			message.setRecipients(Message.RecipientType.TO,
-				InternetAddress.parse("mohsinobaid@gmail.com"));
-			message.setSubject("Testing Subject");
-			message.setText("Dear Mail Crawler,"
-				+ "\n\n No spam to my email, please!");
+			Message message1 = new MimeMessage(session);
+			message1.setFrom(new InternetAddress("from-email@gmail.com"));
+			message1.setRecipients(Message.RecipientType.TO,
+				InternetAddress.parse(email));
+			message1.setSubject(subject);
+			message1.setText(message);
  
-			Transport.send(message);
+			Transport.send(message1);
  
-			System.out.println("Done");
+			System.out.println("Mail sent.");
  
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);
 		}
 	}
+
 }

@@ -272,7 +272,7 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 				status += "Results" + "\n";
 				status += "____________________" + "\n";
 				status += "Option\tVotes" + "\n";
-				int i = 0;
+				int i = 1;
 				for(Long s: results)
 				{
 					

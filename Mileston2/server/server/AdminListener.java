@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 import javax.xml.bind.JAXBException;
 
+import email.SendMailTLS;
+
 import messages.*;
 import messages.Error;
 
@@ -170,6 +172,8 @@ public class AdminListener extends ListenerThread {
 		{
 			results = this.poll.getResultString();
 		}
+		
+		SendMailTLS.SendEmail(this.email, "Poll " + this.poll.getId() + " Results", results);
 		
 		System.out.println(this.email + " " + results);
 	}
