@@ -21,6 +21,7 @@ public class AdminClient extends JFrame {
 	JPanel panel = null;
 	ArrayList<AdminPoll> polls = null;
 	Socket socket = null;
+	JTextField txtEmail = null;
 	
 	public AdminClient(String host, int port) throws IOException
 	{	
@@ -42,7 +43,7 @@ public class AdminClient extends JFrame {
 		this.setVisible(true);
 		
 		polls = new ArrayList<AdminPoll>();
-		AdminPoll poll = new AdminPoll(socket);
+		AdminPoll poll = new AdminPoll(this, socket);
 		polls.add(poll);
 		Thread pollThread = new Thread(poll);
 		pollThread.start();
@@ -56,14 +57,25 @@ public class AdminClient extends JFrame {
 		// email component
 		JPanel emailPanel = new JPanel();
 		emailPanel.add(new JLabel("Email:"));
-		JTextField email = new JTextField();
-		email.setPreferredSize(new Dimension(300,25));
-		emailPanel.add(email);
+		txtEmail = new JTextField();
+		txtEmail.setPreferredSize(new Dimension(300,25));
+		emailPanel.add(txtEmail);
 		panel.add(emailPanel);
 		
 
 		panel.add(polls.get(0));
 		
+	}
+
+	public String getEmailAddress() {
+		if(txtEmail != null)
+		{
+			return this.txtEmail.getText();
+		}
+		else
+		{
+			return "";
+		}
 	}
 	
 

@@ -164,7 +164,14 @@ public class AdminListener extends ListenerThread {
 	}
 
 	private void sendResults() {
+
+		String results = "vote failed";
+		if(this.poll != null)
+		{
+			results = this.poll.getResultString();
+		}
 		
+		System.out.println(this.email + " " + results);
 	}
 	
 	public String getPollId()
