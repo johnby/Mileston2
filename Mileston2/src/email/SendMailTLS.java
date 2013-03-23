@@ -15,8 +15,8 @@ public class SendMailTLS {
  
 	public static void SendEmail(String email, String subject, String message)
 	{
-		final String username = "nikieme4@gmail.com";
-		final String password = "pollserver";
+		final String username = "pollserverv2020@gmail.com";
+		final String password = "pollsrv2020";
  
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
@@ -48,5 +48,5 @@ public class SendMailTLS {
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 }
