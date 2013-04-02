@@ -395,11 +395,14 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 
 	    if(!auto)
 	    {
-		    for(int i=0; i<answers.size(); i++)
-		    {
-		    	data.setValue(answers.get(i).getTextValue(), pu.getResults().get(i));
-		    	System.out.println("f:" + answers.get(i).getTextValue() + ", " + pu.getResults().get(i));
-		    }
+	    	if(pu.getResults().size() > 0)
+	    	{
+			    for(int i=0; i<answers.size(); i++)
+			    {
+			    	data.setValue(answers.get(i).getTextValue(), pu.getResults().get(i));
+			    	System.out.println("f:" + answers.get(i).getTextValue() + ", " + pu.getResults().get(i));
+			    }
+	    	}
 	    }
 	    else
 	    {
@@ -413,8 +416,6 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 	    	}
 	    }
 	    
-
-
 		chart = ChartFactory.createPieChart(pollName,data,true,true,false);
 		PiePlot plot = (PiePlot) chart.getPlot();
 		plot.setSimpleLabels(true); 
