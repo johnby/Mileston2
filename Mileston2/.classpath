@@ -9,7 +9,5 @@
 	<classpathentry kind="src" path="shared"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="javamail-1.4.6/mail.jar"/>
-	<classpathentry kind="lib" path="D:/Android/Libs/TwitterApi/twitter4j-core/twitter4j-core-3.0.3-javadoc.jar"/>
-	<classpathentry kind="lib" path="D:/Android/Libs/TwitterApi/twitter4j-core/twitter4j-core-3.0.3-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
