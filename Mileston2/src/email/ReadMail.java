@@ -78,7 +78,7 @@ public class ReadMail extends Thread{
                       
                       */ 
                      System.out.print(messages[i].getSubject().split("-")[0].toString()+"HELLO"); 
-                      if(messages[i].getSubject().split("-")[0].toString().equals("46scf")) 
+                      if(messages[i].getSubject().split("-")[0].toString().equals(_PollId)) 
                       { 
                          System.out.print(messages[i].getContent().toString()); 
                           int p = Integer.parseInt(messages[i].getContent().toString().trim()); 
