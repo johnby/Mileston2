@@ -21,19 +21,27 @@ public class ReadMail {
                  System.out.println(store); 
                  Folder inbox = store.getFolder("inbox");
                  //set folder from where u wants to read mails
-                 inbox.open(Folder.READ_ONLY);//set access type of Inbox
+                 inbox.open(Folder.READ_ONLY);//set access type of Inbox 
+                 
                  Message messages[] = inbox.getMessages();// gets inbox messages
-                 for (int i = 0; i < messages.length; i++) {
+                 System.out.println(messages.length);
+                 int j =0;
+                 for (int i = messages.length-1; i>0 ; i--) {
                 	 if(messages[i].getFrom()[0].toString().equals("pollserverv2020@gmail.com"))
                 	 {
                 		 System.out.print("PeekaBooo");
+                		 j++;
+                		 System.out.println(j);
+                		 System.out.println(messages[i].getContent().toString());
+                		                            
+                         
                 	 }
                 	 /*
                 System.out.println("------------ Message " + (i + 1) + " ------------");
                 System.out.println("SentDate : " + messages[i].getSentDate()); //print sent date
                 System.out.println("From : " + messages[i].getFrom()[0]); //print email id of sender
                 System.out.println("Sub : " + messages[i].getSubject()); //print subject of email
-                */
+                
                 try
                 {
                       Multipart mulpart = (Multipart) messages[i].getContent();
@@ -48,12 +56,14 @@ public class ReadMail {
                      System.out.println("Exception arise at get Content");
                      ex.printStackTrace();
                 }
+                */
            }
            store.close();
       }
 catch (Exception e) {
 System.out.println(e);  
 }  
+             
 }
   public static void storePart(Part part) throws Exception
      {    
@@ -67,6 +77,8 @@ System.out.println(e);
           while ((i = input.read()) != -1)
          {
          System.out.write(i);
+    
          }
      }
+  
 } 
