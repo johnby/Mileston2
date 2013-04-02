@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import javax.xml.bind.JAXBException;
 
+import email.ReadMail;
 import email.SendMailTLS;
 
 import messages.*;
@@ -19,8 +20,11 @@ public class AdminListener extends ListenerThread {
 
 	private static SecureRandom random = new SecureRandom();
 
-	public String generatePollId(){
-		return new BigInteger(128, random).toString(32).substring(0, 5);
+	public String generatePollId() throws IOException, InterruptedException{
+        String s = new BigInteger(128, random).toString(32).substring(0, 5);
+     Thread t = new ReadMail(7778,s); 
+     t.start(); 
+		return s;
 	}
 	
 	public AdminListener(Socket socket) throws IOException {
@@ -158,6 +162,9 @@ public class AdminListener extends ListenerThread {
 				e.printStackTrace();
 				sendResults();
 				quit();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		
