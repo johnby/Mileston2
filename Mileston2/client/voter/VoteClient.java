@@ -77,7 +77,7 @@ public class VoteClient extends JFrame implements ActionListener {
 		
 	}
 	
-	private void vote(String id, String pollId, long selection)
+	public void vote(String id, String pollId, long selection)
 	{
 		String newId = "";
 		if(id != null)
