@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.xml.bind.JAXBException;
 
@@ -19,12 +20,30 @@ import poll.Poll;
 public class AdminListener extends ListenerThread {
 
 	private static SecureRandom random = new SecureRandom();
+	private static Random rnd = new Random();
+	private static ArrayList<String> taken = new ArrayList<String>();
+	
+	public String generatePollId(){
 
-	public String generatePollId() throws IOException, InterruptedException{
-        String s = new BigInteger(128, random).toString(32).substring(0, 5);
-     Thread t = new ReadMail(7778,s); 
-     t.start(); 
-		return s;
+		String val = "asdmasd89yy";
+		while(!taken.contains(val))
+		{
+			int value = rnd.nextInt(99999);
+			val = Integer.toString(value);
+			while(val.length() < 5)
+			{
+				val += "0";
+			}
+			
+			if(!taken.contains(val))
+			{
+				taken.add(val);
+			}
+		}
+
+		return val;
+		
+		//return new BigInteger(128, random).toString(32).substring(0, 5);
 	}
 	
 	public AdminListener(Socket socket) throws IOException {
@@ -162,9 +181,6 @@ public class AdminListener extends ListenerThread {
 				e.printStackTrace();
 				sendResults();
 				quit();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 		
