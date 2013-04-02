@@ -9,6 +9,7 @@ public class AdminClientLauncher {
 	{
 		AdminClient client = new AdminClient("localhost", ServerLauncher.defaultPort);
 		client.setVisible(true);
+		
 	}
 	
 }

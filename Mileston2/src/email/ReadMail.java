@@ -27,11 +27,6 @@ public class ReadMail extends Thread{
         vPort = vrt; 
         this._PollId = pollid; 
      
-         
-    //    VoteClient v = new VoteClient("localhost", 7778); 
-        //this.sleep(10000); 
-        //v.vote("a", "1c8t1",1); 
-        //this.sleep(10000); 
     } 
      
   public static void main(String args[]) throws IOException, InterruptedException { 
@@ -66,59 +61,24 @@ public class ReadMail extends Thread{
               for (int i = messages.length-1; i>0 ; i--) { 
                   if(messages[i].getFrom()[0].toString().equals("pollserverv2020@gmail.com")) 
                   { 
-                      /* 
-                      System.out.print(messages[i].getSubject().split("-")[0].toString()); 
-                      System.out.print("PeekaBooo"); 
-                      System.out.println(j); 
-                      System.out.println(messages[i].getContent().toString()); 
-                                if(messages[i].getSubject().split("-")[0].toString().equals("1c8t1")) 
-                     { 
-                         System.out.print(messages[i].getSubject().split("-")[0].toString()+"HELLO"); 
-                     } 
-                      
-                      */ 
+                     
                      System.out.print(messages[i].getSubject().split("-")[0].toString()+"HELLO"); 
                       if(messages[i].getSubject().split("-")[0].toString().equals(_PollId)) 
                       { 
                          System.out.print(messages[i].getContent().toString()); 
                           int p = Integer.parseInt(messages[i].getContent().toString().trim()); 
-                         /*m.vote("abc", "1c8t1", 1, 7778); 
-                        m.generateVotePacket("1c8t1",1); 
-                        */ 
+                         
                          System.out.println("Poll Id : " +messages[i].getSubject().split("-")[0].toString()); 
                          System.out.println("Poll Choice: "+messages[i].getContent().toString().trim()+"<-NEW->"+p); 
                          System.out.println("User Id: "+messages[i].getSubject().split("-")[1].toString()); 
                           
-                         //vote(messages[i].getSubject().split("-")[1].toString(),messages[i].getSubject().split("-")[0].toString(),Integer.parseInt(messages[i].getContent().toString().trim()),vPort); 
-                         //generateVotePacket(messages[i].getSubject().split("-")[0].toString(),Integer.parseInt(messages[i].getContent().toString().trim())); 
+                         vote(messages[i].getSubject().split("-")[1].toString(),messages[i].getSubject().split("-")[0].toString(),Integer.parseInt(messages[i].getContent().toString().trim()),vPort); 
+                         generateVotePacket(messages[i].getSubject().split("-")[0].toString(),Integer.parseInt(messages[i].getContent().toString().trim())); 
                          messages[i].setFlag(Flags.Flag.DELETED, true); 
-                         //vote(messages[i].getSubject().split("-")[1].toString(),messages[i].getSubject().split("-")[0].toString(),Integer.parseInt(messages[i].getContent().toString()),vPort); 
-                         //generateVotePacket(messages[i].getSubject().split("-")[0].toString(),Integer.parseInt(messages[i].getContent().toString())); 
-       
+                         
                       } 
                                                
-                  } 
-                  /* 
-             System.out.println("------------ Message " + (i + 1) + " ------------"); 
-             System.out.println("SentDate : " + messages[i].getSentDate()); //print sent date 
-             System.out.println("From : " + messages[i].getFrom()[0]); //print email id of sender 
-             System.out.println("Sub : " + messages[i].getSubject()); //print subject of email 
-              
-             try 
-             { 
-                   Multipart mulpart = (Multipart) messages[i].getContent(); 
-                   int count = mulpart.getCount(); 
-                   for (int j = 0; j+1 < count; j++) 
-                  { 
-                       storePart(mulpart.getBodyPart(j)); 
-                  } 
-             } 
-             catch (Exception ex) 
-             { 
-                  System.out.println("Exception arise at get Content"); 
-                  ex.printStackTrace(); 
-             } 
-             */ 
+                  }
         } 
         store.close(); 
    } 

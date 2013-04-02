@@ -376,7 +376,11 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		}
 	}
 	
-
+	//CHANGED - 2
+	public String getPollID(){
+		return this.pollId;
+	}
+	
 }
 
 class Answer extends JPanel
