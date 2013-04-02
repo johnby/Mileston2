@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,10 +23,35 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.xml.bind.JAXBException;
 
-import messages.*;
+import messages.Connect;
+import messages.ConnectReply;
+import messages.CreatePoll;
+import messages.CreatePollReply;
+import messages.Message;
+import messages.PausePoll;
+import messages.PausePollReply;
+import messages.PollUpdate;
+import messages.ResumePoll;
+import messages.ResumePollReply;
+import messages.StopPoll;
+import messages.StopPollReply;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.data.general.DefaultPieDataset;
+
+
+
 
 public class AdminPoll extends JPanel implements ActionListener, Runnable {
 
+	private boolean auto = false;
+	private CreatePoll autoPoll = null;
+	private String autoEmail = null;
+	
 	public enum State { Connect, Create, Running, Closed };
 	public enum PollState { None, Open, Paused, Closed };
 
@@ -44,6 +70,10 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 	private JLabel lblPollId = null;
 	private JTextArea pollStatus = null;
 	private JPanel answerPanel = null;
+
+	private String pollName = "";
+	private ChartPanel panel = null;
+	private JFreeChart chart = null;
 	
 	private ArrayList<Answer> answers = null;
 	
@@ -54,6 +84,13 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 	
 	private String pollId = "";
 	//private String email = null;
+	
+	private ArrayList<PollUpdateListener> listeners = null;
+	
+	public void addPollUpdateListener(PollUpdateListener listener)
+	{
+		listeners.add(listener);
+	}
 	
 	public AdminPoll(AdminClient adminClient, Socket socket) throws IOException
 	{
@@ -73,12 +110,21 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		
         answers = new ArrayList<Answer>();
         
+        listeners = new ArrayList<PollUpdateListener>();
+        
 		setupPanel();
 		updateGUI();
 	}
 
 	private void setupPanel() {
 
+		// chart panel
+		DefaultPieDataset data = new DefaultPieDataset();
+		chart = ChartFactory.createPieChart("Sample Pie Chart", data,true,true,false);
+		panel = new ChartPanel(chart);
+		panel.setVisible(false);
+		this.add(panel);
+		
 		// question comp
 		JPanel questionPanel = new JPanel();
 		questionPanel.add(new JLabel("Question:"));
@@ -127,6 +173,9 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		pollStatus = new JTextArea();
 		pollStatus.setPreferredSize(new Dimension(300,200));
 		this.add(pollStatus);
+		
+		
+		
 	}
 	
 
@@ -210,6 +259,19 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		}
 	}
 	
+	public void CreatePoll(String question, ArrayList<String> answers, String email)
+	{
+		auto = true;
+		autoPoll = new CreatePoll();
+		autoPoll.setQuestion(question);
+		autoPoll.setAnswers(answers);
+		autoEmail = email;
+		
+		Connect c = new Connect();
+		c.setEmailAddress(autoEmail);
+		sendMessage(c);
+	}
+	
 	private void messageReceived(Object message)
 	{
 		if(this.state == State.Connect)
@@ -218,21 +280,28 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 			{
 				this.state = State.Create;
 				
-				CreatePoll cp = new CreatePoll();
-				cp.setQuestion(txtQuestion.getText());
-				
-				// Add answers here!!!!!!
-				// TO-DO: !!!
-				
-				ArrayList<String> answerList = new ArrayList<String>();
-				for(Answer a : answers)
+				if(auto)
 				{
-					answerList.add(a.getTextValue());
+					sendMessage(autoPoll);
 				}
-				
-				cp.setAnswers(answerList);
-				
-				sendMessage(cp);
+				else
+				{
+					CreatePoll cp = new CreatePoll();
+					cp.setQuestion(txtQuestion.getText());
+					
+					// Add answers here!!!!!!
+					// TO-DO: !!!
+					
+					ArrayList<String> answerList = new ArrayList<String>();
+					for(Answer a : answers)
+					{
+						answerList.add(a.getTextValue());
+					}
+					
+					cp.setAnswers(answerList);
+					
+					sendMessage(cp);
+				}
 			}
 		}
 		else if(this.state == State.Create)
@@ -241,6 +310,26 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 			{
 				CreatePollReply cpr = (CreatePollReply)message;
 				lblPollId.setText(cpr.getPollId());
+				
+			    DefaultPieDataset data = new DefaultPieDataset();
+			    ArrayList<String> answers = (ArrayList<String>) cpr.getAnswers();
+			    for(int i=0; i<answers.size(); i++)
+			    {
+			    	data.setValue(answers.get(i), 0);
+			    }
+			    
+			    pollName = cpr.getPollId() + " - " + cpr.getQuestion();
+			    
+				chart = ChartFactory.createPieChart(pollName,data,true,true,false);
+				
+				panel.setChart(chart);
+				
+				panel.setVisible(true);
+				
+				PollUpdate pu = new PollUpdate();
+				pu.setResults(new ArrayList<Long>());
+				pu.setPollId(((CreatePollReply) message).getPollId());
+				updatePollFrame(pu);
 				
 				this.state = State.Running;
 				this.pState = PollState.Open;
@@ -268,6 +357,8 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 				String id = pu.getPollId();
 				ArrayList<Long> results = pu.getResults();
 				
+				updatePollFrame(pu);
+				
 				String status = "Id = " + id + "\n";
 				status += "Results" + "\n";
 				status += "____________________" + "\n";
@@ -289,6 +380,46 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		}
 		
 		updateGUI();
+	}
+
+	private void updatePollFrame(PollUpdate pu) {
+		
+		for(PollUpdateListener l : listeners)
+		{
+			l.updateReceived(pu);
+		}
+		
+		System.out.println("updating poll");
+		
+	    DefaultPieDataset data = new DefaultPieDataset();
+
+	    if(!auto)
+	    {
+		    for(int i=0; i<answers.size(); i++)
+		    {
+		    	data.setValue(answers.get(i).getTextValue(), pu.getResults().get(i));
+		    	System.out.println("f:" + answers.get(i).getTextValue() + ", " + pu.getResults().get(i));
+		    }
+	    }
+	    else
+	    {
+	    	if(pu.getResults().size() > 0)
+	    	{
+			    for(int i=0; i<autoPoll.getAnswers().size(); i++)
+			    {
+			    	data.setValue(autoPoll.getAnswers().get(i), pu.getResults().get(i));
+			    	System.out.println("f:" + autoPoll.getAnswers().get(i) + ", " + pu.getResults().get(i));
+			    }
+	    	}
+	    }
+	    
+
+
+		chart = ChartFactory.createPieChart(pollName,data,true,true,false);
+		PiePlot plot = (PiePlot) chart.getPlot();
+		plot.setSimpleLabels(true); 
+		plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{1}"));
+		panel.setChart(chart);
 	}
 
 	private void updateGUI() {
@@ -376,11 +507,7 @@ public class AdminPoll extends JPanel implements ActionListener, Runnable {
 		}
 	}
 	
-	//CHANGED - 2
-	public String getPollID(){
-		return this.pollId;
-	}
-	
+
 }
 
 class Answer extends JPanel

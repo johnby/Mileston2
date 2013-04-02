@@ -22,7 +22,7 @@ public class AdminClient extends JFrame {
 	ArrayList<AdminPoll> polls = null;
 	Socket socket = null;
 	JTextField txtEmail = null;
-	private String pid;
+	
 	
 	public AdminClient(String host, int port) throws IOException
 	{	
@@ -46,14 +46,23 @@ public class AdminClient extends JFrame {
 		polls = new ArrayList<AdminPoll>();
 		AdminPoll poll = new AdminPoll(this, socket);
 		polls.add(poll);
-		setPid(poll); //CHANGED 1
 		Thread pollThread = new Thread(poll);
 		pollThread.start();
 		
 		
 		addGuiComponents();
 	}
-
+	
+	public void addPollUpdateListener(PollUpdateListener listener)
+	{
+		polls.get(0).addPollUpdateListener(listener);
+	}
+	
+	public void createPoll(String question, ArrayList<String> answers, String email)
+	{
+		polls.get(0).CreatePoll(question, answers, email);
+	}
+	
 	private void addGuiComponents() {
 	
 		// email component
@@ -69,24 +78,6 @@ public class AdminClient extends JFrame {
 		
 	}
 
-	//CHANGED 2
-	public void setPid(AdminPoll a){
-		this.pid = a.getPollID();
-		System.out.println("POLLLLLLLLLLLL ID -> "+ getPid());
-	}
-	
-	//CHANGED 3
-	public String getPid()
-	{
-		if(this.pid!=null)
-		{
-			return this.pid;
-		}
-		else
-		{
-			return "NO_ID_FOUND";
-		}
-	}
 	public String getEmailAddress() {
 		if(txtEmail != null)
 		{
@@ -97,7 +88,7 @@ public class AdminClient extends JFrame {
 			return "";
 		}
 	}
-	//
+	
 
 
 
