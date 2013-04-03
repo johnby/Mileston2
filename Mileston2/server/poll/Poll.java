@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import email.ReadMail;
-
+//Poll
 public class Poll {
 
 	public enum State { Open, Paused, Closed };
