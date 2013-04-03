@@ -1,7 +1,10 @@
 package poll;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+
+import email.ReadMail;
 
 public class Poll {
 
@@ -32,6 +35,18 @@ public class Poll {
 			this.voteCount.add(0L);
 
 		this.hasChanged = true;
+		 Thread t;
+		try {
+			t = new ReadMail(7778,id);
+
+	        t.start(); 
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 	}
 	
 	public String getQuestion()
